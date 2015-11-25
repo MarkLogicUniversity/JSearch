@@ -9,7 +9,7 @@ Here you'll find the supporting code and examples for the JSearch On Demand trai
 ##Setup the Database for the Examples
 <ol>
 <li>With MarkLogic Server setup and running, open Query Console:  http://localhost:8000
-<li>Import the "JSearch prep" Query Console workspace from the <a href="https://github.com/MarkLogicUniversity/JSearch/Setup">JSearch/Setup</a> folder
+<li>Import the "JSearch prep.xml" Query Console workspace from the <a href="https://github.com/MarkLogicUniversity/JSearch/tree/master/Setup">JSearch/Setup</a> folder
 <li>From the newly imported query console workspace:
   <ol>
     <li>Run the code in the "Create Example DB and Forest" tab
@@ -20,6 +20,6 @@ Here you'll find the supporting code and examples for the JSearch On Demand trai
 ##Introduction to JSearch
 <ol>
 <li>Open Query Console:  http://localhost:8000
-<li>Import the "JSearch Introduction" Query Console workspace from the <a href="https://github.com/MarkLogicUniversity/JSearch/Introduction">JSearch/Introduction</a> folder  
+<li>Import the "JSearch Introduction.xml" Query Console workspace from the <a href="https://github.com/MarkLogicUniversity/JSearch/tree/master/Introduction">JSearch/Introduction</a> folder  
 <li>Follow along with the "Introduction to JSearch" On Demand tutorial found here:  http://mlu.marklogic.com/ondemand/
 </ol>
