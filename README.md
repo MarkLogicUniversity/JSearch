@@ -3,8 +3,14 @@ Here you'll find the supporting code and examples for the JSearch On Demand trai
 
 ##Getting Started
 <ol>
-<li>Download MarkLogic (minimum version 8.0-4):  http://developer.marklogic.com/
-<li>Install, start, and initialize MarkLogic on your local machine:  http://docs.marklogic.com/guide/installation
+<li>Download MarkLogic:
+  <ul>
+    <li>http://developer.marklogic.com/
+  </ul>
+<li>Install, start, and initialize MarkLogic on your local machine:
+  <ul>
+    <li>http://docs.marklogic.com/guide/installation
+  </ul>
 </ol>
 ##Setup the Database for the Examples
 <ol>
