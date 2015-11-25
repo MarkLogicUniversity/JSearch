@@ -1,0 +1,111 @@
+<export><workspace name="JSearch prep"><query name="Create Example DB and Forest" focus="false" active="true" content-source="7063278927476792615:0:Apps" mode="xquery">xquery version "1.0-ml";
+
+(: Create the database and forest :)
+import module namespace admin = "http://marklogic.com/xdmp/admin" at "/MarkLogic/admin.xqy";
+
+let $config := admin:get-configuration() 
+let $config := admin:database-create( $config, "jsearch-ex", xdmp:database("Security"), xdmp:database("Schemas"))
+let $config := admin:forest-create(
+                $config, "jsearch-ex-1",
+                xdmp:host(), (), (), ())
+return admin:save-configuration($config);
+
+(: Attach the forest to the database :)
+import module namespace admin = "http://marklogic.com/xdmp/admin" at "/MarkLogic/admin.xqy";
+let $config := admin:get-configuration() 
+let $config := admin:database-attach-forest( 
+                $config, xdmp:database("jsearch-ex"), xdmp:forest("jsearch-ex-1"))
+return admin:save-configuration($config);</query><query name="Create Indexes" focus="true" active="true" content-source="7063278927476792615:0:Apps" mode="xquery">xquery version "1.0-ml";
+import module namespace admin = "http://marklogic.com/xdmp/admin" at "/MarkLogic/admin.xqy";
+let $title-index := admin:database-range-element-index("string", "", "title", "http://marklogic.com/collation/", fn:false())
+let $author-index := admin:database-range-element-index("string", "", "author", "http://marklogic.com/collation/", fn:false())
+let $format-index := admin:database-range-element-index("string", "", "format", "http://marklogic.com/collation/", fn:false())
+let $price-index := admin:database-range-element-index( "float", "", "price", "", fn:false())
+let $config := admin:get-configuration() 
+let $config := admin:database-add-range-element-index($config, xdmp:database("jsearch-ex"), ($title-index, $author-index, $format-index, $price-index))
+return admin:save-configuration($config);
+
+import module namespace admin = "http://marklogic.com/xdmp/admin" at "/MarkLogic/admin.xqy";
+let $title-lexicon := admin:database-element-word-lexicon( "", "title", "http://marklogic.com/collation/")
+let $config := admin:get-configuration() 
+let $config := admin:database-add-element-word-lexicon( $config, xdmp:database("jsearch-ex"), ($title-lexicon))
+return admin:save-configuration($config);</query><query name="Load Sample Docs" focus="false" active="true" content-source="7063278927476792615:0:Apps" mode="javascript">var directory = '/books/';
+var books = [
+  {uri: 'frost1.json',
+  data: { title: 'Collected Works', 
+          author: 'Robert Frost',
+          edition: {format: 'paperback', price: 30 },
+          synopsis: 'The complete works of the American Poet Robert Frost.'
+        }
+  },
+  {uri: 'twain1.json',
+  data: { title: 'Adventures of Tom Sawyer', 
+          author: 'Mark Twain', 
+          edition: {format: 'paperback', price: 9 },
+          synopsis: 'Tales of mischief and adventure along the Mississippi River with Tom Sawyer, Huck Finn, and Becky Thatcher.' 
+        }
+  },
+ {uri: 'twain2.json',
+  data: { title: 'Adventures of Tom Sawyer', 
+          author: 'Mark Twain',
+          edition: {format: 'hardback', price: 18 },
+          synopsis: 'Tales of mischief and adventure along the Mississippi River with Tom Sawyer, Huck Finn, and Becky Thatcher.'
+         }
+ },
+  {uri: 'twain3.json',
+   data: { title: 'Adventures of Huckleberry Finn', 
+        author: 'Mark Twain',
+        edition: {format: 'paperback', price: 8 },
+        synopsis: 'The adventures of Huck, a boy of 13, and Jim, an escaped slave, rafting down the Mississippi River in pre-Civil War America.'
+      }
+  },
+  {uri: 'twain4.json',
+   data: { title: 'Adventures of Huckleberry Finn', 
+           author: 'Mark Twain',
+           edition: {format: 'hardback', price: 18 },
+           synopsis: 'The adventures of Huck, a boy of 13, and Jim, an escaped slave, rafting down the Mississippi River in pre-Civil War America.'
+         }
+  },
+  {uri: 'steinbeck1.json',
+   data: { title: 'The Grapes of Wrath', 
+           author: 'John Steinbeck', 
+           edition: {format: 'paperback', price: 10 },
+          synopsis: 'Chronicles the 1930s Dust Bowl migration of one Oklahoma farm family, from their homestead and forced to the promised land of California.'
+        }
+  },
+  {uri: 'steinbeck2.json',
+   data: { title: 'Of Mice and Men', 
+           author: 'John Steinbeck', 
+           edition: {format: 'hardback', price: 20 },
+           synopsis: 'A tale of an unlikely pair of drifters who move from job to job as farm laborers in California, until it all goes horribly awry.'
+        }
+  },
+  {uri: 'steinbeck3.json',
+   data: { title: 'East of Eden', 
+           author: 'John Steinbeck', 
+           edition: {format: 'audiobook', price: 16 },
+           synopsis: 'Follows the intertwined destinies of two California families whose generations reenact the fall of Adam and Eve and the rivalry of Cain and Abel.'
+        }
+  },
+  {uri: 'dickens1.json',
+   data: { title: 'Great Expectations', 
+           author: 'Charles Dickens', 
+           edition: {format: 'paperback', price: 10 },
+           synopsis: 'A look at the moral education of a boy who has been persecuted and deceived but whose essential goodness of heart eventually rescues him from snobbery and delusion.'
+        }
+  },
+  {uri: 'dickens2.json',
+   data: { title: 'Oliver Twist', 
+           author: 'Charles Dickens', 
+           edition: {format: 'paperback', price: 10 },
+           synopsis: 'The story of the orphan Oliver Twist, who starts life in a workhouse then sold into an apprenticeship with an undertaker. He escapes from there and falls into a gang of juvenile pickpockets before eventually being saved by a long-lost family member.'
+        }
+  }
+];
+
+books.forEach( function(book) {
+  xdmp.eval(
+            'declareUpdate(); xdmp.documentInsert(uri, data, xdmp.defaultPermissions(), ["classics"]);',
+            {uri: directory + book.uri, data: book.data}
+          );
+});</query></workspace></export>

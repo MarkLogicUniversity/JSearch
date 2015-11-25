@@ -1,0 +1,172 @@
+<export><workspace name="JSearch Introduction"><query name="JSearch Basics" focus="false" active="true" content-source="7063278927476792615:0:Apps" mode="javascript">var jsearch = require('/MarkLogic/jsearch');
+
+jsearch.documents().result();</query><query name="Collections" focus="false" active="true" content-source="7063278927476792615:0:Apps" mode="javascript">var jsearch = require('/MarkLogic/jsearch');
+
+var classics = jsearch.collections('classics');
+classics.documents().result();</query><query name="Pipeline example" focus="false" active="true" content-source="7063278927476792615:0:Apps" mode="javascript">// 1) include the jsearch libary
+var jsearch = require('/MarkLogic/jsearch');
+
+// 2) using the return value from the above, use
+//  one of the JSearch top-level methods. In this
+//  example, we are using .documents
+jsearch.documents()
+  .where(cts.parse('tom OR huck'))  //if desired, specify contraints for the search
+  .orderBy('price')  //if desired, specify the sort for the search
+  .slice(0, 5) //if desired, specify any result subset
+  .map({snippet: true}) //specify any further refinements..
+  .withOptions({returnQueryPlan: true})  //.. or options
+  .result();  //perform the search and get the search results</query><query name="QBE example 1" focus="false" active="true" content-source="7063278927476792615:0:Apps" mode="javascript">var jsearch = require('/MarkLogic/jsearch');
+
+// search the JSON document's 'author' property for the
+//  phrase 'Mark Twain'
+jsearch.documents()
+.where( jsearch.byExample( { author: 'Mark Twain' } ))
+.result();</query><query name="QBE example 2" focus="false" active="true" content-source="7063278927476792615:0:Apps" mode="javascript">var jsearch = require('/MarkLogic/jsearch');
+
+// search by the JSON document's 'price' property. Find documents
+//  where the 'price' is less than 10.00 AND greater than or
+//  equal to 8.00
+jsearch.documents()
+.where( jsearch.byExample({ "$and": [ 
+                            { "price": { "$lt": 10.00}},
+                            { "price": { "$ge": 8.00 }}
+                           ]
+                          }))
+.result();
+</query><query name="Query String example 1" focus="false" active="true" content-source="7063278927476792615:0:Apps" mode="javascript">var jsearch = require('/MarkLogic/jsearch');
+
+// search in any of the JSON documents for the term
+//  'tom' or the term 'huck'
+jsearch.documents()
+.where( cts.parse('tom OR huck') )
+.result();</query><query name="Query String example 2" focus="false" active="true" content-source="7063278927476792615:0:Apps" mode="javascript">var jsearch = require('/MarkLogic/jsearch');
+
+// search in the JSON property called 'price' where 'price'
+//  is less than 10. In this example, we are creating a tag
+//  also called 'price' to represent the JSON property of 'price'.
+//  We could have created a tag called 'amount' to represent
+//  the JSON property of price. The string given to the
+//  cts.parse function would have then been 'amount LT 10'.
+jsearch.documents()
+.where( cts.parse('price LT 10', 
+        {price: cts.jsonPropertyReference('price')} ))
+.result();</query><query name="Query String example 3" focus="false" active="true" content-source="7063278927476792615:0:Apps" mode="javascript">var jsearch = require('/MarkLogic/jsearch');
+
+// creating a tag called 'by' to represent the JSON property
+//  of 'author', find all documents that contain the phrase
+//  'mark twain' in the 'by' property (actually, the 'author'
+//  property).
+var newTagRef = { by: cts.jsonPropertyReference('author') };
+jsearch.documents()
+.where( cts.parse('by: "mark twain"', newTagRef ))
+.result();</query><query name="cts example 1" focus="false" active="true" content-source="7063278927476792615:0:Apps" mode="javascript">var jsearch = require('/MarkLogic/jsearch');
+
+// find all documents that have the phrase, 'mark twain',
+//  in the 'author' property or any part of the phrase 'mark twain'.
+jsearch.documents()
+.where (
+   cts.jsonPropertyWordQuery('author', 'mark twain'))
+.result();
+</query><query name="cts example 2" focus="false" active="true" content-source="7063278927476792615:0:Apps" mode="javascript">var jsearch = require('/MarkLogic/jsearch');
+
+// Search for documents where the document's URI begins
+//  with '/books/' AND the JSON property of title contains
+//  the terms 'huck' or 'tom' AND the JSON property of
+//  'format' matches the term 'paperback' OR the JSON
+//  property of price is less than 10.
+jsearch.documents()
+.where (
+   cts.andQuery([
+     cts.directoryQuery('/books/', 'infinity'),
+     cts.jsonPropertyWordQuery('title', ['huck', 'tom']),
+     cts.orQuery([
+       cts.jsonPropertyValueQuery('format', 'paperback'),
+       cts.jsonPropertyRangeQuery('price', '&lt;', 10)
+     ])
+  ]))
+.result();
+</query><query name="Sort example 1" focus="false" active="true" content-source="7063278927476792615:0:Apps" mode="javascript">var jsearch = require('/MarkLogic/jsearch');
+var newTagRef = { by: cts.jsonPropertyReference('author') };
+
+// Search the documents for the phrase 'by:"mark twain' where
+//  the tag of 'by' is another tag for the JSON property 
+//  of 'author'.
+// Sort the search results by the JSON property of 'title'
+jsearch.documents()
+.where( cts.parse('by:"mark twain"', newTagRef) )
+.orderBy('title')
+.result();</query><query name="Sort example 2" focus="false" active="true" content-source="7063278927476792615:0:Apps" mode="javascript">var jsearch = require('/MarkLogic/jsearch');
+
+// Search the documents using Query By Example where the
+//  JSON property 'author' contains the word 'twain'.
+// Sort the returned results by the JSON property of
+//  'title' in ascending order.
+jsearch.documents()
+.where( jsearch.byExample({'author': {"$word": 'twain' }}))
+.orderBy(
+   cts.indexOrder(cts.jsonPropertyReference('title'), 'ascending')
+)
+.result();
+</query><query name="Sort example 3" focus="false" active="true" content-source="7063278927476792615:0:Apps" mode="javascript">var jsearch = require('/MarkLogic/jsearch');
+
+// Search the documents' JSON property of 'author'
+//  that contain the word 'twain'.
+// Sort the results by both JSON properties of 'price' and 'title'.
+jsearch.documents()
+.where( cts.jsonPropertyWordQuery('author', 'twain'))
+.orderBy('price', 'title')
+.result();
+</query><query name="Slice example 1" focus="false" active="true" content-source="7063278927476792615:0:Apps" mode="javascript">var jsearch = require('/MarkLogic/jsearch');
+// Search for the word 'twain' in the 'author' JSON property.
+// Return a subset of the matches. The subset starts at
+//  the first result found (index 0) and returns a total of
+//  2 results.
+jsearch.documents()
+.where( jsearch.byExample({'author': {"$word": 'twain' }}))
+.slice( 0,2 )
+.result();</query><query name="Slice example 2" focus="false" active="true" content-source="7063278927476792615:0:Apps" mode="javascript">var jsearch = require('/MarkLogic/jsearch');
+
+// Same search but don't return any results, only search
+//  response metadata
+jsearch.documents()
+.where( jsearch.byExample({'author': {"$word": 'twain' }}))
+.slice( 0,0 )
+.result();</query><query name="Using Results" focus="true" active="true" content-source="7063278927476792615:0:Apps" mode="javascript">var jsearch = require('/MarkLogic/jsearch');
+
+// create some JSearch convenience variables for
+//  searching by collections and query by example
+var collection = jsearch.collections;
+var qbe = jsearch.byExample;
+
+// set the QBE example to search by author that
+//  contain the word, 'twain'
+var myQBE = {'author': {"$word": 'twain' }};
+var queryReturn = collection('classics')  //search classics collection
+                  .documents()            //find docs in above collection
+                  .where(qbe(myQBE))      //that match the QBE
+                  .result();              //execute the search
+
+var queryResults = queryReturn.results;  //get the search results
+
+var doc, node, docURI;
+var docArray = [];
+
+// .results returns an array of search results so
+// iterate over the results returned, if any
+for (var count = 0; count &lt; queryResults.length; count++) {
+  // get the document node's URI
+  docURI = queryResults[count].uri;
+  // get the document node object
+  node = queryResults[count].document;
+  // make the document node object mutable
+  doc = node.toObject();
+  // update the author property
+  doc.author = 'M. Twain';
+  // add it to an array so we can see the changed docs
+  docArray.push(doc);
+  
+  // can also update the database with the new information
+  //var collections = xdmp.documentGetCollections(docURI);
+  //xdmp.documentInsert(docURI, doc, xdmp.defaultPermissions(), collections);
+}
+docArray;  // display all the changed docs</query></workspace></export>
