@@ -1,0 +1,108 @@
+<export><workspace name="JSearch Aggregates"><query name="Values example 1" focus="false" active="true" content-source="14878293200213555919:0:Apps" mode="javascript">// .values method example 1
+// Find all of the values for book titles and sort them by their frequency
+
+// include the JSearch libary
+var jsearch = require('/MarkLogic/jsearch');
+// use the .values method to return the values for the title JSON property
+var results = jsearch.values('title')
+// sort by the value frequencies
+              .orderBy('frequency')
+// execute the search
+              .result();
+results;</query><query name="Values example  2" focus="false" active="true" content-source="14878293200213555919:0:Apps" mode="javascript">// .values method example 2
+// Find all of the values for book titles
+// Constrain the search by using the .where method to books where the JSON
+//  author property is 'Mark Twain'
+
+// include the JSearch libary
+var jsearch = require('/MarkLogic/jsearch');
+// return values from the JSON property of title
+var results = jsearch.values('title')
+// but constrained to the books where the JSON property
+//  of author is Mark Twain
+              .where( jsearch.byExample( { author: 'Mark Twain' } ))
+// execute the search
+              .result();
+results;</query><query name="Values example 3" focus="true" active="true" content-source="14878293200213555919:0:Apps" mode="javascript">// .values method example 3
+// Find all of the values for book titles and sort them by their frequency
+// Constrain the search to books in the 'classics' collection
+// Also, futher filter the values return to title values that
+//  match the pattern, *vent* (example: Adventure matches the pattern)
+
+// include the JSearch libary
+var jsearch = require('/MarkLogic/jsearch');
+// limit the search to books in the classics
+//  collection
+var books = jsearch.collections('classics');
+// return the values from the title JSON property
+var results = books.values('title')
+// filter the returned values to those that match the
+//  given pattern
+              .match('*vent*')
+// sort the values by their frequency
+              .orderBy('frequency')
+// return a subset of 3 values starting at the
+//  first position
+              .slice(0,3)
+// execute the search
+              .result()
+results;</query><query name="Tuples example 1" focus="false" active="true" content-source="14878293200213555919:0:Apps" mode="javascript">// .tuples method example 1
+// Find all of the values for book authors and book format
+//  that appear in the same fragment or document
+
+// include the JSearch libary
+var jsearch = require('/MarkLogic/jsearch');
+// return values that co-occur in the same fragement or document
+//  return both author and format JSON property values
+var results = jsearch.tuples(['author', 'format'])
+// execute the search
+              .result();
+results;</query><query name="Tuples example 2" focus="false" active="true" content-source="14878293200213555919:0:Apps" mode="javascript">// .tuples method example 2
+// Find all of the values for book authors and formats
+//  that co-occur in the same document or fragment
+//  and sort them by their values in descending order
+//  of author name first, then book format
+
+// include the JSearch libary
+var jsearch = require('/MarkLogic/jsearch');
+// limit our search to books in
+//  the classics collection
+var books = jsearch.collections('classics');
+// find co-occurring values for the author and format
+//  JSON properties in our Classics collection
+var results = books.tuples(['author','format'])
+// sort by item values, author first then format
+              .orderBy('item', 'descending')
+// execute the search
+              .result()
+results;
+</query><query name="Aggregate example 1" focus="false" active="true" content-source="14878293200213555919:0:Apps" mode="javascript">// .aggregate method example 1
+// Find all of the prices of books
+// Use the .aggregate method to calculate
+//  the minimum, maximum and averge prices
+
+// include the JSearch libary
+var jsearch = require('/MarkLogic/jsearch');
+// return the values from the price JSON property
+var results = jsearch.values('price')
+// calculate the min, max and average prices
+              .aggregate(['min', 'max', 'avg'])
+// execute the search
+              .result();
+results;</query><query name="Aggregate example 2" focus="false" active="true" content-source="14878293200213555919:0:Apps" mode="javascript">// .aggregate method example 2
+// Find all of the values for book prices
+//  where the author JSON property is Mark Twain
+// Use the .aggregate method to calculate
+//  the sum and standard deviation of the prices
+
+//include the JSearch libary
+var jsearch = require('/MarkLogic/jsearch');
+// while not necessary, jsearch's byExample method
+//  could be aliased to better describe that we
+//  are doing a query by example
+var qbe = jsearch.byExample;
+var results = jsearch.values('price')
+              .where(qbe( {author:'Mark Twain'} ))
+              .aggregate(['sum', 'stddev'])
+              .result();
+results;</query></workspace></export>
